@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# ==========================================
 # B2W Monorepo Environment Check Script
-# ==========================================
-
 set -e
 
 print_check() {
@@ -17,37 +14,41 @@ print_check() {
 echo "Checking B2W Stack Environment..."
 echo "----------------------------------"
 
-# Core Tools
-echo "\n== Core Tools =="
+echo -e "\n== Core Tools =="
 print_check git "Git" "git --version"
 print_check node "Node.js" "node -v"
 print_check npm "npm" "npm -v"
 print_check pnpm "pnpm" "pnpm -v"
 print_check vite "Vite" "vite --version"
 
-# Dev Environment
-echo "\n== Dev Environment =="
+echo -e "\n== Dev Environment =="
 print_check brew "Homebrew" "brew --version | head -n 1"
-print_check code "VS Code (code CLI)" "code --version | head -n 1"
+print_check code "VS Code (code CLI)" "which code"
 print_check docker "Docker" "docker --version"
 
-# Deployment Tools
-echo "\n== Deployment Tools =="
+echo -e "\n== Deployment Tools =="
 print_check aws "AWS CLI" "aws --version"
 
-# Frontend Tools
-echo "\n== Frontend Tools =="
-if pnpm list -g tailwindcss &> /dev/null; then
-  echo "✔︎ Tailwind CSS: found via pnpm"
-else
-  echo "✘ Tailwind CSS: Not found"
-fi
-print_check vitest "Vitest" "vitest --version"
-print_check playwright "Playwright" "playwright --version"
+echo -e "\n== Frontend Tools =="
+for tool in tailwindcss vitest playwright; do
+  if pnpm list -g "$tool" &> /dev/null; then
+    echo "✔︎ $tool: $(pnpm list -g --depth=0 $tool | grep $tool)"
+  else
+    echo "✘ $tool: Not found"
+  fi
+done
 
-# Mobile Tools
-echo "\n== Mobile / Android SDK =="
+# Vega-Lite CLI check (any of its aliases)
+if command -v vl2svg &> /dev/null || command -v vl2png &> /dev/null; then
+  echo "✔︎ Vega-Lite CLI tools (vl2svg, vl2png...) detected"
+else
+  echo "✘ Vega-Lite CLI: Not found"
+  echo "  ➡️  If installed via pnpm, ensure PNPM_HOME is in your PATH:"
+  echo "      export PNPM_HOME=\$HOME/Library/pnpm"
+  echo "      export PATH=\"\$PNPM_HOME:\$PATH\""
+fi
+
+echo -e "\n== Mobile / Android SDK =="
 print_check adb "ADB (Android Debug Bridge)" "adb version | head -n 1"
 
-# Final Message
-echo "\n✅ Environment check complete. Review any ✘ above before proceeding."
+echo -e "\n✅ Environment check complete. Review any ✘ above before proceeding."
