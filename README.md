@@ -1,6 +1,7 @@
 # B2W Monorepo Seed
 
 A minimal, portable, automation-ready monorepo for local-first, offline-capable apps.
+From local-only to global CDN-ready, all from a single repo and toolchain.
 
 ## 🔧 Features
 - One-command structure setup: `setup-structure.sh`
